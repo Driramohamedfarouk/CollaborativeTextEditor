@@ -17,13 +17,12 @@ import java.util.concurrent.TimeoutException;
 public class ReceiverApp extends Frame implements ActionListener {
     TextArea tf1;
     Button b1 ;
-    private final static String QUEUE_NAME = "hello";
-
+    private final static String QUEUE_NAME = "to_receiver";
 
     ReceiverApp(){
         b1 = new Button("Receive");
         b1.addActionListener(this);
-        tf1=  new TextArea("Person A did not write yet");
+        tf1=  new TextArea("Click receive to see what A and B wrote...");
         // setting size, layout and visibility of frame
         setTitle("Collaborative Text Editor");
         setSize(800,600);
@@ -34,7 +33,7 @@ public class ReceiverApp extends Frame implements ActionListener {
         setVisible(true);
     }
 
-   public void receive(){
+   public void receive(String queue_name){
        ConnectionFactory factory = new ConnectionFactory();
        factory.setHost("localhost");
        Connection connection = null;
@@ -53,7 +52,7 @@ public class ReceiverApp extends Frame implements ActionListener {
        }
 
        try {
-           channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+           channel.queueDeclare(queue_name, false, false, false, null);
        } catch (IOException ioException) {
            ioException.printStackTrace();
        }
@@ -63,8 +62,8 @@ public class ReceiverApp extends Frame implements ActionListener {
            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
            System.out.println(" [x] Received '" + message + "'");
            tf1.append(" [x] Received '" + message + "'"+ "\n");
-
        };
+
        try {
            channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> { });
        } catch (IOException ioException) {
@@ -74,7 +73,7 @@ public class ReceiverApp extends Frame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        this.receive();
+        receive(QUEUE_NAME);
     }
 
 

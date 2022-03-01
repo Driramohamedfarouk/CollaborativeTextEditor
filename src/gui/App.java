@@ -20,7 +20,7 @@ public abstract class App extends Frame implements ActionListener {
     TextArea tf1;
     TextArea tf2;
     Button b1, b2;
-    private final static String QUEUE_NAME = "hello";
+    protected final static String QUEUE_NAME = "to_receiver";
     // instantiating using constructor
     App() {
         b1= new Button("send");
@@ -41,19 +41,19 @@ public abstract class App extends Frame implements ActionListener {
         pack();
         setVisible(true);
     }
-    protected void emitMessage(String text){
+    protected void emitMessage(String text, String[] queues){
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             String message = text;
-            channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
-            System.out.println(" [x] Sent '" + message + "'");
-        } catch (IOException ioException) {
+            for (String queue : queues ) {
+                channel.basicPublish("", queue, null, message.getBytes(StandardCharsets.UTF_8));
+                //System.out.println(" [x] Sent '" + message + "'");
+            }
+        } catch (IOException | TimeoutException ioException) {
             ioException.printStackTrace();
-        } catch (TimeoutException timeoutException) {
-            timeoutException.printStackTrace();
         }
     }
 
