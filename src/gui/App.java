@@ -10,36 +10,46 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.event.ActionEvent;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 // Our class extends Frame class and implements ActionListener interface
-public abstract class App extends Frame implements ActionListener {
+public class App  {
     // creating instances of TextField and Button class
-    TextArea tf1;
-    TextArea tf2;
-    Button b1, b2;
+    JTextArea tf1;
+    JTextArea tf2;
+    final String title = "Collaborative Text Editor";
+
     protected final static String QUEUE_NAME = "to_receiver";
     // instantiating using constructor
     App() {
-        b1= new Button("send");
-        b2= new Button("send");
-        b1.addActionListener(this);
-        b2.addActionListener(this);
-        tf1=  new TextArea("Person A writes here");
-        tf2=  new TextArea("Person B writes here");
+        tf1=  new JTextArea("Person A writes here");
+        tf2=  new JTextArea("Person B writes here");
+        JFrame frame = new JFrame(title);
+        JPanel p = new JPanel();
+        p.setLayout(new GridLayout(2,1));
+        p.add(tf1);
+        p.add(tf2);
+        frame.add(p);
+        frame.getRootPane().setBorder(new EmptyBorder(10, 10, 10, 10));
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setLocation(50, 50);
+        frame.setVisible(true);
 
-        // setting size, layout and visibility of frame
-        setTitle("Collaborative Text Editor");
-        setSize(800,600);
-        setLayout(new GridLayout(2, 2));
-        add(tf1);
-        add(b1);
-        add(tf2);
-        add(b2);
-        pack();
-        setVisible(true);
     }
     protected void emitMessage(String text, String[] queues){
         ConnectionFactory factory = new ConnectionFactory();
@@ -58,6 +68,6 @@ public abstract class App extends Frame implements ActionListener {
     }
 
     // defining the actionPerformed method
-    public abstract void actionPerformed(ActionEvent e) ;
+    //public abstract void actionPerformed(ActionEvent e) ;
 
 }

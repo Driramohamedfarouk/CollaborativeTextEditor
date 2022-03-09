@@ -5,7 +5,11 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
-import java.awt.event.ActionEvent;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
@@ -15,16 +19,38 @@ import static gui.Sender1.TO_FRIEND2;
 
 public class Sender2 extends App {
     protected final static String TO_FRIEND= "to_friend";
-
+    private String[] my_queues = {QUEUE_NAME,TO_FRIEND} ;
 
     public Sender2() {
-        super();
-        //this.b1.setEnabled(false);
-        //this.tf1.setEnabled(false);
-        setTitle("Sender 2");
-        this.b1.setLabel("receive");
-        this.b1.addActionListener(this);
-        this.tf1.setText("You are not allowed to write here");
+
+        MessageBean bean = new MessageBean();
+        bean.addPropertyChangeListener(e ->
+                tf2.setText((String) e.getNewValue())
+        );
+
+        tf1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                receive(TO_FRIEND2);
+            }
+        });
+        tf2.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                //bean.setMessage(tf1.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                //bean.setMessage(tf1.getText());
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                emitMessage(tf2.getText(),my_queues);
+            }
+        });
     }
 
     public void receive(String queue_name){
@@ -48,12 +74,11 @@ public class Sender2 extends App {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-        System.out.println(" [*] Waiting for messages. Press the button to receive");
-        this.tf1.setText(" [*] Waiting for messages. Press the button to receive \n");
+        this.tf1.setText("no one wrote yet ");
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             System.out.println(" [x] Received '" + message + "'");
-            tf1.append(" [x] Received '" + message + "' "+ "\n");
+            tf1.setText(message);
         };
 
         try {
@@ -63,16 +88,7 @@ public class Sender2 extends App {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-        if(source==this.b2){
-        String[] my_queues = {QUEUE_NAME,TO_FRIEND} ;
-        emitMessage("Person B : "+tf2.getText(),my_queues);
-    }else if (source==this.b1) {
-            receive(TO_FRIEND2);
-        }
-    }
+
 
     public static void main(String[] args) {
         new Sender2();
