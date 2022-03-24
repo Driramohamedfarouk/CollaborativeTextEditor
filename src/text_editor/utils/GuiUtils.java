@@ -14,23 +14,22 @@ public class GuiUtils {
     public static final long MAX_ELAPSED_TIME = 3000 ;
     static Timer timer = new Timer() ;
 
-    public static void informUsers(JTextArea textArea,JLabel label ,String user_name, String queue_name){
-        /*textArea.addMouseListener(new MouseAdapter() {
+    /*public static void informUsers(JTextArea textArea,JLabel label ,String user_name, String queue_name){
+        *//*textArea.addMouseListener(new MouseAdapter() {
             @Override
             public synchronized void mousePressed(MouseEvent e) {
                 super.mouseClicked(e);
                 label.setText(user_name);
                 BrokerUtils.emitMessage(user_name,queue_name);
             }
-        });*/
-    }
+        });*//*
+    }*/
 
+    //TODO: keep only necessary params
     public static void add_typing_operations(JTextArea textArea,
                                              JLabel label,
                                              String[] my_queues,
-                                             String name_queue,
-                                             String user_name,
-                                             App how){
+                                             App app){
         textArea.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -41,20 +40,19 @@ public class GuiUtils {
             @Override
             public void keyPressed(KeyEvent e) {
                 //bean.setMessage(tf1.getText());
-                switch (user_name){
+                String username  = app.getUSER_NAME() ;
+                switch (username){
                     case "user 1" :
-                        how.setLabel1(user_name);
+                        app.setLabel1(username);
                     case "user 2" :
-                        how.setLabel2(user_name);
+                        app.setLabel2(username);
                     default:
                         break;
                 }
-                BrokerUtils.emitMessage(user_name,name_queue);
-                //start_time = System.currentTimeMillis() ;
-                //System.out.println("pressed at "+start_time);
+                BrokerUtils.emitMessage(username, app.getUsersNameQueue());
             }
 
-            //TODO : add sleep thant emit message : no one writes here
+            //TODO : add sleep thant emit message : no one writes here->done
 
             @Override
             public void keyReleased(KeyEvent e) {
@@ -64,7 +62,7 @@ public class GuiUtils {
                     timer.cancel();
                     //System.out.println("cancelled all scheduled work");
                     timer = new Timer();
-                    timer.schedule(new MyTask(finish_time,name_queue,label),MAX_ELAPSED_TIME);
+                    timer.schedule(new MyTask(finish_time, app.getUsersNameQueue(), label),MAX_ELAPSED_TIME);
                 }
             }
         });
