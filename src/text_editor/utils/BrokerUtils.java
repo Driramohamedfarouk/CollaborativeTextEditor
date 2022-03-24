@@ -1,4 +1,4 @@
-package gui;
+package text_editor.utils;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-import static gui.App.QUEUE_NAME;
+import static text_editor.gui.App.QUEUE_NAME;
 
 public class BrokerUtils {
     public static void emitMessage(String text, String[] queues){
@@ -18,6 +18,9 @@ public class BrokerUtils {
         factory.setHost("localhost");
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
+             /*
+             * why QUEUE_NAME ?
+             * */
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             String message = text;
             for (String queue : queues ) {
@@ -29,7 +32,7 @@ public class BrokerUtils {
         }
     }
 
-    static void  emitMessage(String text, String queues)  {
+    public static void  emitMessage(String text, String queues)  {
         emitMessage(text, new String[] {queues});
     }
 
@@ -54,7 +57,7 @@ public class BrokerUtils {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-        System.out.println(" [*] Waiting for messages");
+        System.out.println(" [*] Waiting for messages from :"+queue_name);
         return  channel ;
     }
 

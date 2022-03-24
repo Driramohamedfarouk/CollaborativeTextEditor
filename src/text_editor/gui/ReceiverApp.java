@@ -1,15 +1,13 @@
-package gui;
+package text_editor.gui;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
-import javax.sound.midi.Receiver;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyBoundsListener;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
@@ -20,7 +18,7 @@ public class ReceiverApp extends Frame implements ActionListener {
     private final static String QUEUE_NAME = "to_receiver";
 
     ReceiverApp(){
-        b1 = new Button("Receive");
+        b1 = new Button("test.Receive");
         b1.addActionListener(this);
         tf1=  new TextArea("Click receive to see what A and B wrote...");
         // setting size, layout and visibility of frame

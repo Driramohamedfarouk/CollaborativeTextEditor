@@ -1,4 +1,4 @@
-package gui;
+package text_editor.utils;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

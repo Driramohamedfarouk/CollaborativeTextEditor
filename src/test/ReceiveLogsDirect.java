@@ -1,3 +1,5 @@
+package test;
+
 import com.rabbitmq.client.*;
 
 public class ReceiveLogsDirect {
@@ -14,7 +16,7 @@ public class ReceiveLogsDirect {
         String queueName = channel.queueDeclare().getQueue();
 
         if (argv.length < 1) {
-            System.err.println("Usage: ReceiveLogsDirect [info] [warning] [error]");
+            System.err.println("Usage: test.ReceiveLogsDirect [info] [warning] [error]");
             System.exit(1);
         }
 
