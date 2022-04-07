@@ -10,9 +10,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-import static text_editor.gui.App.QUEUE_NAME;
 
 public class BrokerUtils {
+    private static final String QUEUE_NAME = "";
+
     public static void emitMessage(String text, String[] queues){
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");

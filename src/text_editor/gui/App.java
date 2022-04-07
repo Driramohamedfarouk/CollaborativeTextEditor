@@ -1,46 +1,52 @@
 package text_editor.gui;
 
+import text_editor.utils.GuiUtils;
+import text_editor.utils.MessageBean;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.ArrayList;
+
+import static text_editor.utils.BrokerUtils.receive;
 
 //TODO : model all queues and remove unnecessary ones -> done
 //TODO : make an observable on the labels to avoid using queues ->done
 //TODO : consider OOP strong encapsulation principles
 public class App  {
-    JTextArea tf1;
-    JTextArea tf2;
+    private static int N =3   ;
+    ArrayList<JTextArea> textAreas ;
+    ArrayList<JLabel> labels ;
+    String[][] FROM_TO = new String[N][N];
+    String[][] USER_NAMES_QUEUES  = new String[N][N] ;
+    int id  ;
+
     final String title = "Collaborative Text Editor";
     public JFrame frame = new JFrame(title);
-    protected JLabel label1 = new JLabel("No one is writing here");
-    protected JLabel label2 = new JLabel("No one is writing here");
-    public final static String QUEUE_NAME = "to_receiver";
 
     public String USER_NAME ;
     public String USERS_NAME_QUEUE ;
-    private String[] my_queues ;
-
-    public final static String TO_FRIEND2 = "to_friend2";
-    public final static String USERS_QUEUE_2 = "users_queue_2" ;
-
-    public final static String TO_FRIEND= "to_friend";
-    public static final String USERS_QUEUE_1 = "users_queue_1" ;
 
     App() {
-        label2.setBackground(Color.PINK);
-        tf1=  new JTextArea("Person A writes here");
-        tf2=  new JTextArea("Person B writes here");
+        textAreas = new ArrayList<JTextArea>();
+        labels = new ArrayList<JLabel>();
         JPanel p = new JPanel();
         JPanel rp = new JPanel();
         rp.setSize(100,600);
         JPanel lp = new JPanel();
         p.setLayout(new GridLayout(1,2));
-        rp.setLayout(new GridLayout(2,1));
-        lp.setLayout(new GridLayout(2,1));
-        rp.add(label1);
-        rp.add(label2);
-        lp.add(tf1);
-        lp.add(tf2);
+        rp.setLayout(new GridLayout(N,1));
+        lp.setLayout(new GridLayout(N,1));
+        for(int i =0 ; i<N; i++){
+            textAreas.add(new JTextArea("Person"+i+1 +"writes here")) ;
+            labels.add(new JLabel("No one is writing here"));
+            lp.add(textAreas.get(i));
+            rp.add(labels.get(i));
+            for (int j =0 ; j<N; j++){
+                FROM_TO[i][j]="from_"+(i+1)+"_to_"+(j+1) ;
+                USER_NAMES_QUEUES[i][j]= "users_queue_"+(i+1)+"inform"+(j+1) ;
+            }
+        }
         p.add(rp); p.add(lp);
         frame.add(p);
         frame.getRootPane().setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -50,59 +56,66 @@ public class App  {
         frame.setVisible(true);
     }
 
-    public JTextArea getTf1() {
-        return tf1;
-    }
-
-    public void setTf1(JTextArea tf1) {
-        this.tf1 = tf1;
-    }
-
-    public JTextArea getTf2() {
-        return tf2;
-    }
-
-    public void setTf2(JTextArea tf2) {
-        this.tf2 = tf2;
-    }
-
-    public JLabel getLabel1() {
-        return label1;
-    }
-
-    public void setLabel1(String label1) {
-        this.label1.setText(label1);
-    }
-
-    public JLabel getLabel2() {
-        return label2;
-    }
-
-    public void setLabel2(String label2) {
-        this.label2.setText(label2);
-    }
-
-    public void setLabel1(JLabel label1) {
-        this.label1 = label1;
-    }
-
-    public void setLabel2(JLabel label2) {
-        this.label2 = label2;
+    public void set_up(int id , App app){
+        for(int i=0;i<getN();i++){
+            if(i!=id){
+                receive(FROM_TO[i][id],textAreas.get(i));
+                receive(USER_NAMES_QUEUES[i][id],labels.get(i));
+            }
+        }
+        MessageBean bean = new MessageBean();
+        bean.addPropertyChangeListener(m ->
+                textAreas.get(id).setText((String) m.getNewValue())
+        );
+        GuiUtils.add_typing_operations(textAreas.get(id),labels.get(id),FROM_TO[id],app);
     }
 
     public String getUSER_NAME() {
         return USER_NAME;
     }
-
     public void setUSER_NAME(String USER_NAME) {
         this.USER_NAME = USER_NAME;
     }
 
-    public String getUsersNameQueue() {
-        return this.USERS_NAME_QUEUE;
-    }
-
+    public String getUsersNameQueue() { return this.USERS_NAME_QUEUE; }
     public void setUsersNameQueue(String usersNameQueue) {
         this.USERS_NAME_QUEUE = usersNameQueue;
+    }
+
+    public static int getN() {
+        return N;
+    }
+
+    public static void setN(int n) {
+        N = n;
+    }
+
+    public ArrayList<JTextArea> getTextAreas() {
+        return textAreas;
+    }
+
+    public void setTextAreas(ArrayList<JTextArea> textAreas) {
+        this.textAreas = textAreas;
+    }
+
+    public ArrayList<JLabel> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(ArrayList<JLabel> labels) {
+        this.labels = labels;
+    }
+
+    public String[][] getUSER_NAMES_QUEUES() {
+        return USER_NAMES_QUEUES;
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

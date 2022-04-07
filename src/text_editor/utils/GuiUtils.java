@@ -41,15 +41,18 @@ public class GuiUtils {
             public void keyPressed(KeyEvent e) {
                 //bean.setMessage(tf1.getText());
                 String username  = app.getUSER_NAME() ;
+                //TODO : transform the swich into a generic loop
                 switch (username){
                     case "user 1" :
-                        app.setLabel1(username);
+                        app.getLabels().get(0).setText(username);
                     case "user 2" :
-                        app.setLabel2(username);
+                        app.getLabels().get(1).setText(username);
+                    case "user 3" :
+                        app.getLabels().get(2).setText(username);
                     default:
                         break;
                 }
-                BrokerUtils.emitMessage(username, app.getUsersNameQueue());
+                BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[app.getId()]);
             }
 
             //TODO : add sleep thant emit message : no one writes here->done
@@ -62,7 +65,7 @@ public class GuiUtils {
                     timer.cancel();
                     //System.out.println("cancelled all scheduled work");
                     timer = new Timer();
-                    timer.schedule(new MyTask(finish_time, app.getUsersNameQueue(), label),MAX_ELAPSED_TIME);
+                    timer.schedule(new MyTask(finish_time, app.getUSER_NAMES_QUEUES()[app.getId()], label),MAX_ELAPSED_TIME);
                 }
             }
         });
