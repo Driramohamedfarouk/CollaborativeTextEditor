@@ -42,7 +42,7 @@ public class GuiUtils {
                 //bean.setMessage(tf1.getText());
                 String username  = app.getUSER_NAME() ;
                 //TODO : transform the swich into a generic loop
-                switch (username){
+                /*switch (username){
                     case "user 1" :
                         app.getLabels().get(0).setText(username);
                     case "user 2" :
@@ -51,8 +51,10 @@ public class GuiUtils {
                         app.getLabels().get(2).setText(username);
                     default:
                         break;
-                }
-                BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[app.getId()]);
+                }*/
+                int id = app.getId();
+                app.getLabels().get(id).setText(username);
+                BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[id]);
             }
 
             //TODO : add sleep thant emit message : no one writes here->done
