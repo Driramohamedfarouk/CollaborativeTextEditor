@@ -4,15 +4,20 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import text_editor.gui.App;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+import static java.lang.System.exit;
+
 
 public class BrokerUtils {
     private static final String QUEUE_NAME = "";
+    private static Connection conn = null ;
 
     public static void emitMessage(String text, String[] queues){
         ConnectionFactory factory = new ConnectionFactory();
@@ -22,10 +27,10 @@ public class BrokerUtils {
              /*
              * why QUEUE_NAME ?
              * */
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-            String message = text;
+            //channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            //String message = text;
             for (String queue : queues ) {
-                channel.basicPublish("", queue, null, message.getBytes(StandardCharsets.UTF_8));
+                channel.basicPublish("", queue, null, text.getBytes(StandardCharsets.UTF_8));
                 //System.out.println(" [x] Sent '" + message + "'");
             }
         } catch (IOException | TimeoutException ioException) {
@@ -46,6 +51,7 @@ public class BrokerUtils {
         } catch (IOException | TimeoutException ioException) {
             ioException.printStackTrace();
         }
+        setConn(connection);
         Channel channel = null;
         try {
             channel = connection.createChannel();
@@ -82,7 +88,7 @@ public class BrokerUtils {
         }
     }
 
-    public static  void receive(String queue_name,JLabel label){
+    public static  void receive(String queue_name,JLabel label,JTextArea textArea){
         Channel channel = establish_connection(queue_name);
         //tf2.setText(" [*] Waiting for messages. Press the button to receive \n");
         label.setText("No one is writing here");
@@ -90,6 +96,11 @@ public class BrokerUtils {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             //System.out.println(" [x] Received '" + message + "'");
             label.setText(message);
+            if (message.contains("user")){
+                textArea.setBackground(Color.LIGHT_GRAY);
+            }else{
+                textArea.setBackground(Color.WHITE);
+            }
         };
 
         try {
@@ -98,5 +109,31 @@ public class BrokerUtils {
             ioException.printStackTrace();
         }
 
+    }
+
+    public static  void receive(String queue_name,App app){
+        Channel channel = establish_connection(queue_name);
+        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+            int id = Integer.parseInt(message) ;
+            if(id<0||id > App.getN()){
+                exit(1);
+            }
+            app.set_up(id , app);
+        };
+
+        try {
+            channel.basicConsume(queue_name, true, deliverCallback, consumerTag -> { });
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
+
+    public static Connection getConn() {
+        return conn;
+    }
+
+    public static void setConn(Connection conn) {
+        BrokerUtils.conn = conn;
     }
 }

@@ -7,6 +7,7 @@ public class Sender1 extends App {
         frame.setLocation(50,50);
         this.setUSER_NAME("user 1");
         this.setId(0);
+        SingletonSender.getInstance().getMy_app().add(this);
         setUsersNameQueue("users_queue_1");
         set_up(id ,this);
     }

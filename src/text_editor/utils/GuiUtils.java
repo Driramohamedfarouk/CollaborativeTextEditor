@@ -3,10 +3,13 @@ package text_editor.utils;
 import text_editor.gui.App;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.Timer;
 
 import static text_editor.utils.BrokerUtils.emitMessage;
+import static text_editor.utils.BrokerUtils.getConn;
 
 public class GuiUtils {
     //public static long start_time ;
@@ -14,16 +17,33 @@ public class GuiUtils {
     public static final long MAX_ELAPSED_TIME = 3000 ;
     static Timer timer = new Timer() ;
 
-    /*public static void informUsers(JTextArea textArea,JLabel label ,String user_name, String queue_name){
-        *//*textArea.addMouseListener(new MouseAdapter() {
+    public static void informUsers(JTextArea textArea,int textAreaID,App app) {
+        textArea.addMouseListener(new MouseAdapter() {
             @Override
             public synchronized void mousePressed(MouseEvent e) {
                 super.mouseClicked(e);
-                label.setText(user_name);
-                BrokerUtils.emitMessage(user_name,queue_name);
+                //label.setText(user_name);
+                //BrokerUtils.emitMessage(user_name, queue_name);
+                textArea.setBackground(Color.LIGHT_GRAY);
+                try {
+                    getConn().close();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+
+                //emitMessage(String.valueOf(textAreaID),queue_name[textAreaID][]);
+                app.set_up(textAreaID,app);
+
+                //TODO : try this
+                /*
+                close the connection
+                reEstablish the connection
+                inform all users by a message so they can re set up their app with the new ID
+                 */
+                //app.set_up(textAreaID,app);
             }
-        });*//*
-    }*/
+        });
+    }
 
     //TODO: keep only necessary params
     public static void add_typing_operations(JTextArea textArea,
@@ -41,19 +61,9 @@ public class GuiUtils {
             public void keyPressed(KeyEvent e) {
                 //bean.setMessage(tf1.getText());
                 String username  = app.getUSER_NAME() ;
-                //TODO : transform the swich into a generic loop
-                /*switch (username){
-                    case "user 1" :
-                        app.getLabels().get(0).setText(username);
-                    case "user 2" :
-                        app.getLabels().get(1).setText(username);
-                    case "user 3" :
-                        app.getLabels().get(2).setText(username);
-                    default:
-                        break;
-                }*/
                 int id = app.getId();
                 app.getLabels().get(id).setText(username);
+                textArea.setBackground(Color.LIGHT_GRAY);
                 BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[id]);
             }
 
@@ -67,7 +77,7 @@ public class GuiUtils {
                     timer.cancel();
                     //System.out.println("cancelled all scheduled work");
                     timer = new Timer();
-                    timer.schedule(new MyTask(finish_time, app.getUSER_NAMES_QUEUES()[app.getId()], label),MAX_ELAPSED_TIME);
+                    timer.schedule(new MyTask(finish_time, app.getUSER_NAMES_QUEUES()[app.getId()], label,textArea),MAX_ELAPSED_TIME);
                 }
             }
         });

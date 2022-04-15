@@ -1,5 +1,6 @@
 package text_editor.gui;
 
+import text_editor.utils.BrokerUtils;
 import text_editor.utils.GuiUtils;
 import text_editor.utils.MessageBean;
 
@@ -12,7 +13,7 @@ import static text_editor.utils.BrokerUtils.receive;
 
 //TODO : model all queues and remove unnecessary ones -> done
 //TODO : make an observable on the labels to avoid using queues ->done
-//TODO : consider OOP strong encapsulation principles
+//TODO : consider OOP strong encapsulation principles -> done
 public class App  {
     private static int N =3   ;
     ArrayList<JTextArea> textAreas ;
@@ -60,7 +61,8 @@ public class App  {
         for(int i=0;i<getN();i++){
             if(i!=id){
                 receive(FROM_TO[i][id],textAreas.get(i));
-                receive(USER_NAMES_QUEUES[i][id],labels.get(i));
+                receive(USER_NAMES_QUEUES[i][id],labels.get(i),textAreas.get(i));
+                //BrokerUtils.emitMessage(app.toString(),);
             }
         }
         MessageBean bean = new MessageBean();
