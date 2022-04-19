@@ -1,15 +1,14 @@
 package text_editor.utils;
 
 import text_editor.gui.App;
+import text_editor.gui.SingletonServer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.util.Timer;
 
 import static text_editor.utils.BrokerUtils.emitMessage;
-import static text_editor.utils.BrokerUtils.getConn;
 
 public class GuiUtils {
     //public static long start_time ;
@@ -24,15 +23,10 @@ public class GuiUtils {
                 super.mouseClicked(e);
                 //label.setText(user_name);
                 //BrokerUtils.emitMessage(user_name, queue_name);
-                textArea.setBackground(Color.LIGHT_GRAY);
-                try {
-                    getConn().close();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-
+                //textArea.setBackground(Color.LIGHT_GRAY);
+                //app.setId(textAreaID);
                 //emitMessage(String.valueOf(textAreaID),queue_name[textAreaID][]);
-                app.set_up(textAreaID,app);
+                //app.set_up(textAreaID,app);
 
                 //TODO : try this
                 /*
@@ -47,8 +41,8 @@ public class GuiUtils {
 
     //TODO: keep only necessary params
     public static void add_typing_operations(JTextArea textArea,
+                                             int textAreaID ,
                                              JLabel label,
-                                             String[] my_queues,
                                              App app){
         textArea.addKeyListener(new KeyListener() {
             @Override
@@ -61,23 +55,24 @@ public class GuiUtils {
             public void keyPressed(KeyEvent e) {
                 //bean.setMessage(tf1.getText());
                 String username  = app.getUSER_NAME() ;
-                int id = app.getId();
-                app.getLabels().get(id).setText(username);
+                app.getLabels().get(textAreaID).setText(username);
                 textArea.setBackground(Color.LIGHT_GRAY);
-                BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[id]);
+                //BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[id]);
             }
 
             //TODO : add sleep thant emit message : no one writes here->done
 
+
+            //TODO: needs to be synchronized
             @Override
             public void keyReleased(KeyEvent e) {
-                emitMessage(textArea.getText(),my_queues);
+                emitMessage(app.getId()+":"+textAreaID+":"+textArea.getText(), SingletonServer.getInstance().getServerQueue());
                 setFinish_time(System.currentTimeMillis()) ;
                 synchronized (this){
                     timer.cancel();
                     //System.out.println("cancelled all scheduled work");
                     timer = new Timer();
-                    timer.schedule(new MyTask(finish_time, app.getUSER_NAMES_QUEUES()[app.getId()], label,textArea),MAX_ELAPSED_TIME);
+                    timer.schedule(new MyTask(finish_time, App.getUSER_NAMES_QUEUES()[app.getId()], label,textArea),MAX_ELAPSED_TIME);
                 }
             }
         });

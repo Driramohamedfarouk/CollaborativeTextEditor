@@ -1,8 +1,6 @@
 package text_editor.gui;
 
-import text_editor.utils.BrokerUtils;
 import text_editor.utils.GuiUtils;
-import text_editor.utils.MessageBean;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,9 +16,12 @@ public class App  {
     private static int N =3   ;
     ArrayList<JTextArea> textAreas ;
     ArrayList<JLabel> labels ;
-    String[][] FROM_TO = new String[N][N];
-    String[][] USER_NAMES_QUEUES  = new String[N][N] ;
+    static  String[][] FROM_TO = new String[N][N];
+    static  String[][] USER_NAMES_QUEUES  = new String[N][N] ;
     int id  ;
+
+    private static final String[][] SERVER_EMIT_QUEUE = new String[N][N];
+
 
     final String title = "Collaborative Text Editor";
     public JFrame frame = new JFrame(title);
@@ -39,12 +40,14 @@ public class App  {
         rp.setLayout(new GridLayout(N,1));
         lp.setLayout(new GridLayout(N,1));
         for(int i =0 ; i<N; i++){
-            textAreas.add(new JTextArea("Person"+i+1 +"writes here")) ;
+            textAreas.add(new JTextArea("click here to start writing")) ;
             labels.add(new JLabel("No one is writing here"));
             lp.add(textAreas.get(i));
             rp.add(labels.get(i));
+            //"to_field_"+id+"_of_user_"+i
+            //SERVER_EMIT_QUEUE[i]= "to_field_"+(id+1)+"_of_user_"+(i+1) ;
             for (int j =0 ; j<N; j++){
-                FROM_TO[i][j]="from_"+(i+1)+"_to_"+(j+1) ;
+                SERVER_EMIT_QUEUE[i][j]="user_"+(i+1)+"_area_"+(j+1) ;
                 USER_NAMES_QUEUES[i][j]= "users_queue_"+(i+1)+"inform"+(j+1) ;
             }
         }
@@ -59,17 +62,10 @@ public class App  {
 
     public void set_up(int id , App app){
         for(int i=0;i<getN();i++){
-            if(i!=id){
-                receive(FROM_TO[i][id],textAreas.get(i));
-                receive(USER_NAMES_QUEUES[i][id],labels.get(i),textAreas.get(i));
-                //BrokerUtils.emitMessage(app.toString(),);
-            }
+                receive(SERVER_EMIT_QUEUE[id][i],textAreas.get(i),labels.get(i),i,app);
+                //receive(USER_NAMES_QUEUES[i][id],labels.get(i),textAreas.get(i));
+                GuiUtils.add_typing_operations(textAreas.get(i),i,labels.get(i),app);
         }
-        MessageBean bean = new MessageBean();
-        bean.addPropertyChangeListener(m ->
-                textAreas.get(id).setText((String) m.getNewValue())
-        );
-        GuiUtils.add_typing_operations(textAreas.get(id),labels.get(id),FROM_TO[id],app);
     }
 
     public String getUSER_NAME() {
@@ -108,7 +104,7 @@ public class App  {
         this.labels = labels;
     }
 
-    public String[][] getUSER_NAMES_QUEUES() {
+    public static String[][] getUSER_NAMES_QUEUES() {
         return USER_NAMES_QUEUES;
     }
 
@@ -118,6 +114,15 @@ public class App  {
     }
 
     public void setId(int id) {
+        System.out.println("old ID "+this.id+" ** new ID "+id);
         this.id = id;
+    }
+
+    public static String[][] getFROM_TO() {
+        return FROM_TO;
+    }
+
+    public static String[][] getSERVER_EMIT_QUEUE() {
+        return SERVER_EMIT_QUEUE;
     }
 }

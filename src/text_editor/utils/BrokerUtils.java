@@ -12,11 +12,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
-import static java.lang.System.exit;
-
 
 public class BrokerUtils {
-    private static final String QUEUE_NAME = "";
+    private static final String QUEUE_NAME = "server_queue";
     private static Connection conn = null ;
 
     public static void emitMessage(String text, String[] queues){
@@ -24,10 +22,8 @@ public class BrokerUtils {
         factory.setHost("localhost");
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
-             /*
-             * why QUEUE_NAME ?
-             * */
-            //channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             //String message = text;
             for (String queue : queues ) {
                 channel.basicPublish("", queue, null, text.getBytes(StandardCharsets.UTF_8));
@@ -70,7 +66,7 @@ public class BrokerUtils {
 
     // defining the actionPerformed method
     //public abstract void actionPerformed(ActionEvent e) ;
-    public static void receive(String queue_name, JTextArea textArea){
+    public static void receive(String queue_name, JTextArea textArea,JLabel label ,int textAreaID,App app){
 
         Channel channel = establish_connection(queue_name);
         //tf2.setText(" [*] Waiting for messages. Press the button to receive \n");
@@ -78,7 +74,16 @@ public class BrokerUtils {
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             //System.out.println(" [x] Received '" + message + "'");
-            textArea.setText(message);
+            String[] arrOfStr = message.split(":", 2);
+            int senderId = Integer.parseInt(arrOfStr[0].trim()) +1 ;
+            label.setText("user "+senderId);
+            textArea.setText(arrOfStr[1]);
+            textArea.setBackground(Color.LIGHT_GRAY);
+            /*if (message.contains("user")){
+                textArea.setBackground(Color.LIGHT_GRAY);
+            }else{
+                textArea.setBackground(Color.WHITE);
+            }*/
         };
 
         try {
@@ -102,26 +107,27 @@ public class BrokerUtils {
                 textArea.setBackground(Color.WHITE);
             }
         };
-
         try {
             channel.basicConsume(queue_name, true, deliverCallback, consumerTag -> { });
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-
     }
 
-    public static  void receive(String queue_name,App app){
+    public static  void receive(String queue_name){
         Channel channel = establish_connection(queue_name);
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            int id = Integer.parseInt(message) ;
-            if(id<0||id > App.getN()){
-                exit(1);
+            String[] arrOfStr = message.split(":", 3);
+            int id = Integer.parseInt(arrOfStr[0].trim());
+            int from_textArea = Integer.parseInt(arrOfStr[1].trim()) ;
+            //System.out.println("user "+id+" wrote : '"+arrOfStr[2]+"' in area "+from_textArea);
+             for(int i=0;i<App.getN();i++){
+                if(i!=id){
+                    emitMessage(arrOfStr[0]+":"+arrOfStr[2],App.getSERVER_EMIT_QUEUE()[i][from_textArea]);
+                }
             }
-            app.set_up(id , app);
         };
-
         try {
             channel.basicConsume(queue_name, true, deliverCallback, consumerTag -> { });
         } catch (IOException ioException) {
