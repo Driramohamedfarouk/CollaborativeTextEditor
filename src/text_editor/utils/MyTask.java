@@ -9,13 +9,15 @@ import static text_editor.utils.BrokerUtils.emitMessage;
 
 public class MyTask extends TimerTask {
     private long last_pressed_time ;
-    private String[] queue_names ;
+    private String queue_name ;
     private JLabel label ;
     private JTextArea textArea ;
+    private int id ;
 
-    public MyTask(long last_pressed_time, String[] queue_names, JLabel label,JTextArea textArea) {
+    public MyTask(long last_pressed_time, String queue_names, int textAreaID, JLabel label, JTextArea textArea) {
         this.last_pressed_time = last_pressed_time;
-        this.queue_names = queue_names;
+        this.queue_name = queue_names;
+        this.id = textAreaID ;
         this.label = label;
         this.textArea = textArea ;
     }
@@ -27,18 +29,11 @@ public class MyTask extends TimerTask {
             if (System.currentTimeMillis() - GuiUtils.getFinish_time() > 0) {
                 label.setText("No one is writing here");
                 textArea.setBackground(Color.WHITE);
-                emitMessage("No one is writing here", queue_names);
+                emitMessage("999:"+id+":No one is writing here", queue_name);
             } else {
                 System.out.println("I tested no ");
             }
         }
     }
 
-    public String[] getQueue_names() {
-        return queue_names;
-    }
-
-    public void setQueue_names(String[] queue_names) {
-        this.queue_names = queue_names;
-    }
 }

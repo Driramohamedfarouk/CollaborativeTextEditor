@@ -76,13 +76,18 @@ public class BrokerUtils {
             //System.out.println(" [x] Received '" + message + "'");
             String[] arrOfStr = message.split(":", 2);
             int senderId = Integer.parseInt(arrOfStr[0].trim()) +1 ;
-            label.setText("user "+senderId);
-            textArea.setText(arrOfStr[1]);
-            textArea.setBackground(Color.LIGHT_GRAY);
+            if(senderId==1000){
+                textArea.setBackground(Color.WHITE);
+                label.setText(arrOfStr[1]);
+            }else {
+                label.setText("user " + senderId);
+                textArea.setText(arrOfStr[1]);
+                textArea.setBackground(Color.LIGHT_GRAY);
+            }
             /*if (message.contains("user")){
                 textArea.setBackground(Color.LIGHT_GRAY);
             }else{
-                textArea.setBackground(Color.WHITE);
+
             }*/
         };
 

@@ -72,7 +72,7 @@ public class GuiUtils {
                     timer.cancel();
                     //System.out.println("cancelled all scheduled work");
                     timer = new Timer();
-                    timer.schedule(new MyTask(finish_time, App.getUSER_NAMES_QUEUES()[app.getId()], label,textArea),MAX_ELAPSED_TIME);
+                    timer.schedule(new MyTask(finish_time, SingletonServer.getInstance().getServerQueue(), textAreaID ,label,textArea),MAX_ELAPSED_TIME);
                 }
             }
         });
