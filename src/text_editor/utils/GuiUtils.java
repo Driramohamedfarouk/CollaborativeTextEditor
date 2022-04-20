@@ -11,33 +11,9 @@ import java.util.Timer;
 import static text_editor.utils.BrokerUtils.emitMessage;
 
 public class GuiUtils {
-    //public static long start_time ;
     public static long finish_time ;
     public static final long MAX_ELAPSED_TIME = 3000 ;
     static Timer timer = new Timer() ;
-
-    public static void informUsers(JTextArea textArea,int textAreaID,App app) {
-        textArea.addMouseListener(new MouseAdapter() {
-            @Override
-            public synchronized void mousePressed(MouseEvent e) {
-                super.mouseClicked(e);
-                //label.setText(user_name);
-                //BrokerUtils.emitMessage(user_name, queue_name);
-                //textArea.setBackground(Color.LIGHT_GRAY);
-                //app.setId(textAreaID);
-                //emitMessage(String.valueOf(textAreaID),queue_name[textAreaID][]);
-                //app.set_up(textAreaID,app);
-
-                //TODO : try this
-                /*
-                close the connection
-                reEstablish the connection
-                inform all users by a message so they can re set up their app with the new ID
-                 */
-                //app.set_up(textAreaID,app);
-            }
-        });
-    }
 
     //TODO: keep only necessary params
     public static void add_typing_operations(JTextArea textArea,
@@ -46,14 +22,10 @@ public class GuiUtils {
                                              App app){
         textArea.addKeyListener(new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                //bean.setMessage(tf1.getText());
-                //BrokerUtils.emitMessage(USER_NAME,USERS_QUEUE_2);
-            }
+            public void keyTyped(KeyEvent e) {}
 
             @Override
             public void keyPressed(KeyEvent e) {
-                //bean.setMessage(tf1.getText());
                 if(app.getLabels().get(textAreaID).getText().equals("No one is writing here") ||
                         app.getLabels().get(textAreaID).getText().equals(app.getUSER_NAME())
                 ) {
@@ -66,7 +38,6 @@ public class GuiUtils {
                                     " is writing here now , Please wait until he finishes!",
                             "Warning !!!", JOptionPane.ERROR_MESSAGE);
                 }
-                //BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[id]);
             }
 
             //TODO : add sleep thant emit message : no one writes here->done
@@ -81,7 +52,7 @@ public class GuiUtils {
                     timer.cancel();
                     //System.out.println("cancelled all scheduled work");
                     timer = new Timer();
-                    timer.schedule(new MyTask(finish_time, SingletonServer.getInstance().getServerQueue(), textAreaID ,label,textArea),MAX_ELAPSED_TIME);
+                    timer.schedule(new MyTask(SingletonServer.getInstance().getServerQueue(), textAreaID ,label,textArea),MAX_ELAPSED_TIME);
                 }
             }
         });

@@ -8,14 +8,12 @@ import java.util.TimerTask;
 import static text_editor.utils.BrokerUtils.emitMessage;
 
 public class MyTask extends TimerTask {
-    private long last_pressed_time ;
-    private String queue_name ;
-    private JLabel label ;
-    private JTextArea textArea ;
-    private int id ;
+    private final String queue_name ;
+    private final JLabel label ;
+    private final JTextArea textArea ;
+    private final int id ;
 
-    public MyTask(long last_pressed_time, String queue_names, int textAreaID, JLabel label, JTextArea textArea) {
-        this.last_pressed_time = last_pressed_time;
+    public MyTask( String queue_names, int textAreaID, JLabel label, JTextArea textArea) {
         this.queue_name = queue_names;
         this.id = textAreaID ;
         this.label = label;

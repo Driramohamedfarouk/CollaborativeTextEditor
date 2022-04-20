@@ -84,11 +84,6 @@ public class BrokerUtils {
                 textArea.setText(arrOfStr[1]);
                 textArea.setBackground(Color.LIGHT_GRAY);
             }
-            /*if (message.contains("user")){
-                textArea.setBackground(Color.LIGHT_GRAY);
-            }else{
-
-            }*/
         };
 
         try {
