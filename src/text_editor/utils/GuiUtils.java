@@ -54,9 +54,18 @@ public class GuiUtils {
             @Override
             public void keyPressed(KeyEvent e) {
                 //bean.setMessage(tf1.getText());
-                String username  = app.getUSER_NAME() ;
-                app.getLabels().get(textAreaID).setText(username);
-                textArea.setBackground(Color.LIGHT_GRAY);
+                if(app.getLabels().get(textAreaID).getText().equals("No one is writing here") ||
+                        app.getLabels().get(textAreaID).getText().equals(app.getUSER_NAME())
+                ) {
+                    String username = app.getUSER_NAME();
+                    app.getLabels().get(textAreaID).setText(username);
+                    textArea.setBackground(Color.LIGHT_GRAY);
+                }else{
+                    JOptionPane.showMessageDialog(new JFrame(),
+                            app.getLabels().get(textAreaID).getText()+
+                                    " is writing here now , Please wait until he finishes!",
+                            "Warning !!!", JOptionPane.ERROR_MESSAGE);
+                }
                 //BrokerUtils.emitMessage(username, app.getUSER_NAMES_QUEUES()[id]);
             }
 
